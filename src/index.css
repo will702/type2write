@@ -1,0 +1,514 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* Surface palette — warm off-white, not cream */
+  --bg:            oklch(0.985 0.004 80);   /* body: near-neutral off-white */
+  --surface:       oklch(1 0 0);            /* sidebar: pure white */
+  --desk:          oklch(0.936 0.010 72);   /* preview desk: warm neutral */
+
+  /* Ink */
+  --ink:           oklch(0.295 0.028 259);  /* #27303f equivalent */
+  --ink-muted:     oklch(0.42  0.016 260);  /* labels / secondary */
+
+  /* Accent — warm clay/cognac, used for actions + selection ONLY */
+  --accent:        oklch(0.42  0.12  48);
+  --accent-h:      oklch(0.36  0.12  48);   /* hover */
+  --accent-a:      oklch(0.31  0.11  48);   /* active/pressed */
+  --accent-soft:   oklch(0.42  0.12  48 / 0.10); /* ring tint */
+
+  /* Borders & rings */
+  --border:        oklch(0.905 0.007 72);
+  --ring:          oklch(0.42  0.12  48 / 0.28);
+
+  /* Warning state */
+  --warn-bg:       oklch(0.97  0.045 72);
+  --warn-text:     oklch(0.40  0.095 56);
+  --warn-border:   oklch(0.88  0.075 68);
+
+  /* Success (download feedback) */
+  --success:       oklch(0.44  0.12  148);
+
+  /* Shape */
+  --radius:        6px;
+  --radius-lg:     10px;
+
+  /* Z-index scale */
+  --z-panel:       10;
+  --z-sticky:      20;
+  --z-toast:       50;
+
+  /* Transition presets */
+  --t-fast:        150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --t-base:        220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   GLOBAL RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar — left-aligned wordmark, hairline bottom */
+.app-header {
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.875rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.app-tagline {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+/* 2-pane layout: sidebar | desk */
+.app-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  min-height: 0;
+}
+
+/* Footer */
+.app-footer {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.775rem;
+  color: var(--ink-muted);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   EDITOR SIDEBAR — unified panel, sections divided by hairlines
+   ============================================================ */
+.controls-panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Each component is a flat section (no cards, no shadows) */
+.controls,
+.paper-picker,
+.font-picker {
+  padding: 1.125rem 1.375rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.font-picker {
+  border-bottom: none; /* last section */
+}
+
+/* Section headings within the sidebar */
+.section-label {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  letter-spacing: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* ============================================================
+   CONTROLS (text + identity)
+   ============================================================ */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.text-input,
+.short-input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.525rem 0.7rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+  width: 100%;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.text-input::placeholder,
+.short-input::placeholder {
+  color: oklch(0.52 0.010 260); /* ≥ 4.5:1 on --bg */
+}
+
+.text-input:focus,
+.short-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+  background: var(--surface);
+}
+
+/* Identity subsection */
+.identity-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+/* Line-count meter */
+.line-meter {
+  font-size: 0.74rem;
+  color: var(--ink-muted);
+  text-align: right;
+  transition: color var(--t-fast);
+  user-select: none;
+}
+
+.line-meter.overflow {
+  color: var(--warn-text);
+  font-weight: 500;
+}
+
+/* Inline overflow alert (no emoji) */
+.overflow-alert {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--warn-text);
+  line-height: 1.45;
+}
+
+/* ============================================================
+   PAPER PICKER
+   ============================================================ */
+.picker-options {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.paper-thumb {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  width: 64px;
+  padding: 0 0 3px;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
+}
+
+.paper-thumb img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+
+.paper-thumb span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  line-height: 1;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.paper-thumb:hover {
+  transform: translateY(-2px);
+  border-color: oklch(0.60 0.08 48);
+}
+
+.paper-thumb[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.paper-thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* ============================================================
+   FONT PICKER
+   ============================================================ */
+.font-swatch {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.625rem 0.4rem;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--ink);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast),
+              background var(--t-fast), transform var(--t-fast);
+  flex: 1;
+  min-width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.font-swatch-sample {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.font-swatch-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1;
+}
+
+.font-swatch:hover {
+  transform: translateY(-2px);
+  border-color: oklch(0.60 0.08 48);
+}
+
+.font-swatch[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.font-swatch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* ============================================================
+   PREVIEW DESK
+   ============================================================ */
+.preview-panel {
+  background: var(--desk);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 2rem 2rem;
+  overflow-y: auto;
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+  position: relative;
+}
+
+/* Paper on the desk — crisp shadow, no border */
+.preview-canvas {
+  max-width: 100%;
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 3px oklch(0 0 0 / 0.08),
+    0 6px 18px oklch(0 0 0 / 0.14),
+    0 18px 40px oklch(0 0 0 / 0.08);
+  display: block;
+  transition: opacity var(--t-base);
+}
+
+.preview-canvas.hidden {
+  display: none;
+}
+
+/* Loading skeleton — paper-shaped shimmer */
+.preview-skeleton {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 3 / 4;
+  max-height: 78vh;
+  border-radius: 2px;
+  background: oklch(0.96 0.005 80);
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 1px 3px oklch(0 0 0 / 0.06),
+    0 6px 18px oklch(0 0 0 / 0.10);
+}
+
+.preview-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(1 0 0 / 0.55) 50%,
+    transparent 100%
+  );
+  animation: sk-shimmer 1.6s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes sk-shimmer {
+  to { transform: translateX(200%); }
+}
+
+/* Empty hint — shows when text is empty after first render */
+.preview-hint {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.4rem 1rem;
+  white-space: nowrap;
+}
+
+/* Download button — full state vocabulary */
+.download-btn {
+  background: var(--accent);
+  color: oklch(1 0 0);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.625rem 2.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: 'Inter', system-ui, sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  min-width: 10.5rem;
+  text-align: center;
+  transition:
+    background var(--t-fast),
+    transform var(--t-fast),
+    box-shadow var(--t-fast),
+    opacity var(--t-fast);
+}
+
+.download-btn:hover:not(:disabled) {
+  background: var(--accent-h);
+  transform: translateY(-1px);
+}
+
+.download-btn:active:not(:disabled) {
+  background: var(--accent-a);
+  transform: translateY(0);
+}
+
+.download-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.download-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.download-btn.saved {
+  background: var(--success);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .app-main {
+    grid-template-columns: 1fr;
+  }
+
+  .controls-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    overflow-y: visible;
+  }
+
+  .preview-panel {
+    padding: 1.5rem 1rem;
+    min-height: 60vh;
+  }
+
+  .preview-canvas {
+    max-height: 60vh;
+  }
+
+  .preview-skeleton {
+    max-height: 60vh;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .preview-skeleton::after {
+    display: none;
+  }
+}

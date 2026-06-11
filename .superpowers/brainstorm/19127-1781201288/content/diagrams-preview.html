@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagram Preview — TypeToWrite</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+    background: #0f1117;
+    color: #e6edf3;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin-bottom: 0.4rem;
+  }
+  .meta {
+    font-size: 0.8rem;
+    color: #7d8590;
+    margin-bottom: 2.5rem;
+  }
+  .diagram-block {
+    margin-bottom: 2.5rem;
+  }
+  .diagram-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7d8590;
+    margin-bottom: 0.75rem;
+  }
+  .diagram-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin-bottom: 1rem;
+  }
+  .diagram-wrap {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.5rem;
+    overflow-x: auto;
+  }
+  .diagram-wrap .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #21262d;
+    margin: 2.5rem 0;
+  }
+  .footer-note {
+    font-size: 0.8rem;
+    color: #7d8590;
+    text-align: center;
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+<h1>TypeToWrite — Mermaid Diagram Preview</h1>
+<p class="meta">4 diagrams proposed for README.md · Approve each or note changes in terminal</p>
+
+<!-- 1. Rendering Pipeline -->
+<div class="diagram-block">
+  <p class="diagram-title">Diagram 1 of 4</p>
+  <p class="diagram-label">Rendering Pipeline</p>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart LR
+    A([User types]) --> B[App state\ntext · nama · kelas\npaperIdx · fontIdx]
+    B --> C[Preview.jsx\n150 ms debounce]
+    C --> D[renderToCanvas\nlib/render.js]
+    D --> E{await fontsReady}
+    E --> F[loadImage\npaper.file]
+    F --> G[drawImage\npaper background]
+    G --> H[fillText\nnama · kelas · lines]
+    H --> I[Copy offscreen\n→ display canvas]
+    I --> J([Preview appears\nsetReady true])
+    J --> K([Download PNG\nfull resolution])
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 2. Component Tree -->
+<div class="diagram-block">
+  <p class="diagram-title">Diagram 2 of 4</p>
+  <p class="diagram-label">Component Tree &amp; Props</p>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+graph TD
+    A["App.jsx\n─────────────────\nstate: text · nama · kelas\n       paperIdx · fontIdx\n       renderResult"]
+    A -->|text · nama · kelas\nlineCount · maxLines · overflow\nonChange| B["Controls.jsx\ntextarea · name · class inputs\nline-count meter · overflow alert"]
+    A -->|value · onChange| C["PaperPicker.jsx\n5 paper thumbnails"]
+    A -->|value · onChange| D["FontPicker.jsx\n3 handwriting swatches"]
+    A -->|text · nama · kelas\npaperIdx · fontIdx\nonRenderDone| E["Preview.jsx\nskeleton · canvas · download btn"]
+    E -.->|lineCount · overflow| A
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 3. State & Data Flow -->
+<div class="diagram-block">
+  <p class="diagram-title">Diagram 3 of 4</p>
+  <p class="diagram-label">State &amp; Data Flow</p>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart TD
+    U([User input])
+
+    U -->|types text| CT[Controls.jsx\nupdates text · nama · kelas]
+    U -->|picks paper| PP[PaperPicker.jsx\nupdates paperIdx]
+    U -->|picks font| FP[FontPicker.jsx\nupdates fontIdx]
+
+    CT --> AS[App state\nsingle source of truth]
+    PP --> AS
+    FP --> AS
+
+    AS -->|all props| PV[Preview.jsx\ntriggers re-render on change]
+    PV -->|onRenderDone| RR["renderResult\n{ lineCount, overflow }"]
+    RR --> AS
+
+    AS -->|lineCount · maxLines · overflow| CT2[Controls.jsx\nshows line meter\nor overflow alert]
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 4. Async Sequence -->
+<div class="diagram-block">
+  <p class="diagram-title">Diagram 4 of 4</p>
+  <p class="diagram-label">Async Rendering Sequence</p>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant P as Preview.jsx
+    participant R as render.js
+    participant F as fonts.js
+    participant C as Canvas API
+
+    Note over F: App load — fonts resolve once
+    F->>F: new FontFace() × 3
+    F->>F: face.load() → document.fonts.add()
+
+    U->>P: types or changes any input
+    P->>P: debounce 150 ms
+    P->>R: renderToCanvas(text, nama, kelas, paperIdx, fontIdx)
+    R->>F: await fontsReady
+    F-->>R: all fonts available
+    R->>C: loadImage(paper.file)
+    C-->>R: HTMLImageElement
+    R->>C: canvas.width = img.naturalWidth
+    R->>C: drawImage(img, 0, 0)
+    R->>C: fillText(nama, kelas)
+    R->>C: fillText(lines[i]) × N
+    R-->>P: return { lineCount, overflow }
+    P->>C: copy offscreen → display canvas
+    P->>P: setReady(true)
+    P-->>U: paper preview visible
+    </div>
+  </div>
+</div>
+
+<p class="footer-note">These become Mermaid fenced code blocks in README.md — GitHub renders them automatically.</p>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#1f6feb',
+      primaryTextColor: '#e6edf3',
+      primaryBorderColor: '#30363d',
+      lineColor: '#7d8590',
+      secondaryColor: '#161b22',
+      tertiaryColor: '#21262d',
+      background: '#0d1117',
+      mainBkg: '#161b22',
+      nodeBorder: '#30363d',
+      clusterBkg: '#161b22',
+      titleColor: '#f0f6fc',
+      edgeLabelBackground: '#161b22',
+      actorBkg: '#161b22',
+      actorBorder: '#30363d',
+      actorTextColor: '#e6edf3',
+      actorLineColor: '#7d8590',
+      signalColor: '#7d8590',
+      signalTextColor: '#e6edf3',
+      labelBoxBkgColor: '#161b22',
+      labelBoxBorderColor: '#30363d',
+      labelTextColor: '#e6edf3',
+      loopTextColor: '#e6edf3',
+      noteBorderColor: '#30363d',
+      noteBkgColor: '#21262d',
+      noteTextColor: '#e6edf3',
+      activationBorderColor: '#1f6feb',
+      activationBkgColor: '#1f2937',
+      sequenceNumberColor: '#e6edf3',
+      fontSize: '14px',
+    },
+    flowchart: { curve: 'basis', padding: 20 },
+    sequence: { actorMargin: 60, messageMargin: 30, mirrorActors: false }
+  });
+</script>
+</body>
+</html>
