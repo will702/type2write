@@ -1,5 +1,0 @@
-{"type":"server-started","port":50675,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:50675","screen_dir":"/Users/willson/typetowrite-polished/web/.superpowers/brainstorm/19127-1781201288/content","state_dir":"/Users/willson/typetowrite-polished/web/.superpowers/brainstorm/19127-1781201288/state"}
-{"type":"screen-added","file":"/Users/willson/typetowrite-polished/web/.superpowers/brainstorm/19127-1781201288/content/format-choice.html"}
-{"source":"user-event","type":"click","text":"A\n    \n      Mermaid diagrams in README.md\n      GitHub renders Mermaid natively — flowcharts, sequence diagrams, component trees appear as clean vector graphics right in the README. Zero extra files, always in sync with code.\n      \n        ```mermaid\n        flowchart LR\n          Input --> Canvas --> PNG\n        ```","choice":"a","id":null,"timestamp":1781201321744}
-{"type":"screen-added","file":"/Users/willson/typetowrite-polished/web/.superpowers/brainstorm/19127-1781201288/content/waiting-1.html"}
-{"type":"screen-added","file":"/Users/willson/typetowrite-polished/web/.superpowers/brainstorm/19127-1781201288/content/diagrams-preview.html"}
